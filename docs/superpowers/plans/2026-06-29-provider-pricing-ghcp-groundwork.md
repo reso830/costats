@@ -607,19 +607,19 @@ git commit -m "feat: wire local Copilot telemetry behind opt-in settings"
 - Modify: `src/costats.App/ViewModels/PulseViewModel.cs`
 - Test manually through build; add unit tests only if view-model construction can be tested without WPF dispatcher changes.
 
-- [ ] **Step 1: Preserve all source profiles**
+- [x] **Step 1: Preserve all source profiles**
 
 Modify `PulseViewModel.OnNext` so provider IDs that are not exactly `codex`, `claude`, or `copilot` remain in `Providers` and are not discarded from refresh/display metadata.
 
-- [ ] **Step 2: Keep existing tabs stable**
+- [x] **Step 2: Keep existing tabs stable**
 
 Do not redesign XAML. Continue filling `Codex`, `Claude`, `Copilot`, and `ClaudeProfiles` for current UI compatibility. The generic `Providers` collection becomes the expansion surface for future Agy/GHCP/provider pages.
 
-- [ ] **Step 3: Add refresh target fallback**
+- [x] **Step 3: Add refresh target fallback**
 
 Modify `SelectedProviderId` so an unknown selected provider can be refreshed by ID once the UI exposes it. Current behavior for indices `0`, `1`, and Copilot remains unchanged.
 
-- [ ] **Step 4: Run build**
+- [x] **Step 4: Run build**
 
 Run:
 
@@ -629,7 +629,7 @@ dotnet build .\costats.sln -c Debug
 
 Expected: build passes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add src/costats.App/ViewModels/PulseViewModel.cs

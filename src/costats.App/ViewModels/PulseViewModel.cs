@@ -79,15 +79,27 @@ public sealed partial class PulseViewModel : ObservableObject, IObserver<PulseSt
 
     public ObservableCollection<ProviderPulseViewModel> ClaudeProfiles { get; } = new();
 
+    public ObservableCollection<ProviderPulseViewModel> DynamicProviders { get; } = new();
+
     /// <summary>
     /// Returns the currently selected provider based on tab index.
     /// </summary>
-    public ProviderPulseViewModel SelectedProvider => SelectedTabIndex switch
+    public ProviderPulseViewModel SelectedProvider
     {
-        0 => Codex,
-        1 => Claude,
-        _ => IsCopilotEnabled ? Copilot : Codex
-    };
+        get
+        {
+            if (SelectedTabIndex == 0)
+                return Codex;
+
+            if (SelectedTabIndex == 1)
+                return Claude;
+
+            if (IsCopilotEnabled && SelectedTabIndex == 2)
+                return Copilot;
+
+            return SelectedDynamicProvider ?? (IsCopilotEnabled ? Copilot : Codex);
+        }
+    }
 
     /// <summary>
     /// Returns the provider ID for the currently selected tab.
@@ -108,7 +120,22 @@ public sealed partial class PulseViewModel : ObservableObject, IObserver<PulseSt
                 return "claude";
             }
 
-            return IsCopilotEnabled ? "copilot" : "codex";
+            if (IsCopilotEnabled && SelectedTabIndex == 2)
+                return "copilot";
+
+            return SelectedDynamicProvider?.ProviderId ?? (IsCopilotEnabled ? "copilot" : "codex");
+        }
+    }
+
+    private ProviderPulseViewModel? SelectedDynamicProvider
+    {
+        get
+        {
+            var dynamicBaseIndex = IsCopilotEnabled ? 3 : 2;
+            var dynamicIndex = SelectedTabIndex - dynamicBaseIndex;
+            return dynamicIndex >= 0 && dynamicIndex < DynamicProviders.Count
+                ? DynamicProviders[dynamicIndex]
+                : null;
         }
     }
 
@@ -161,7 +188,7 @@ public sealed partial class PulseViewModel : ObservableObject, IObserver<PulseSt
         System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
         {
             IsCopilotEnabled = _settings.CopilotEnabled;
-            if (!IsCopilotEnabled && SelectedTabIndex > 1)
+            if (!IsCopilotEnabled && SelectedTabIndex == 2 && DynamicProviders.Count == 0)
             {
                 SelectedTabIndex = 0;
             }
@@ -173,6 +200,7 @@ public sealed partial class PulseViewModel : ObservableObject, IObserver<PulseSt
             {
                 // ── Build all data in local variables first (no UI mutations yet) ──
                 var newProviders = new List<ProviderPulseViewModel>();
+                var dynamicProviderList = new List<ProviderPulseViewModel>();
                 var claudeProfileList = new List<ProviderPulseViewModel>();
                 ProviderPulseViewModel? newCodex = null;
                 ProviderPulseViewModel? newClaude = null;
@@ -231,6 +259,10 @@ public sealed partial class PulseViewModel : ObservableObject, IObserver<PulseSt
                             }
                         }
                     }
+                    else
+                    {
+                        dynamicProviderList.Add(vm);
+                    }
                 }
 
                 // Sort claude profiles by session utilization descending (worst-first)
@@ -287,6 +319,9 @@ public sealed partial class PulseViewModel : ObservableObject, IObserver<PulseSt
 
                 ClaudeProfiles.Clear();
                 foreach (var p in claudeProfileList) ClaudeProfiles.Add(p);
+
+                DynamicProviders.Clear();
+                foreach (var p in dynamicProviderList) DynamicProviders.Add(p);
             }
 
             // Only notify SelectedProvider if the reference actually changed
