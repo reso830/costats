@@ -26,4 +26,16 @@ public sealed class AppSettings
     /// Whether the GitHub Copilot personal usage provider is enabled.
     /// </summary>
     public bool CopilotEnabled { get; set; } = false;
+
+    /// <summary>
+    /// Whether local GitHub Copilot telemetry/log scanning is enabled.
+    /// Disabled by default because telemetry roots may contain sensitive local records.
+    /// </summary>
+    public bool CopilotTelemetryEnabled { get; set; } = false;
+
+    /// <summary>
+    /// Explicit local roots to scan for GitHub Copilot telemetry records.
+    /// Empty means no telemetry roots are scanned.
+    /// </summary>
+    public string[] CopilotTelemetryRoots { get; set; } = [];
 }

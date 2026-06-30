@@ -1,3 +1,4 @@
+using costats.Application.Pricing;
 using costats.Core.Pulse;
 
 namespace costats.Infrastructure.Expense;
@@ -43,6 +44,24 @@ public sealed class ExpenseAnalyzer
 
         var slices = await LogDigestor.DigestCodexLogsAsync(windowStart, today, cancellationToken).ConfigureAwait(false);
         return BuildDigest(slices, today, DefaultWindowDays);
+    }
+
+    /// <summary>
+    /// Produces a consumption digest from local GitHub Copilot telemetry roots.
+    /// </summary>
+    public async Task<ConsumptionDigest?> AnalyzeCopilotTelemetryAsync(
+        IPricingCatalog pricingCatalog,
+        IEnumerable<string> roots,
+        CancellationToken cancellationToken)
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        var windowStart = today.AddDays(-(DefaultWindowDays - 1));
+
+        var slices = await CopilotTelemetryDigestor
+            .DigestAsync(pricingCatalog, roots, windowStart, today, cancellationToken)
+            .ConfigureAwait(false);
+
+        return slices.Count == 0 ? null : BuildDigest(slices, today, DefaultWindowDays);
     }
 
     private static ConsumptionDigest BuildDigest(
