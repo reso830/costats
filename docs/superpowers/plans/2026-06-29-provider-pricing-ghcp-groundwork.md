@@ -437,7 +437,7 @@ git commit -m "feat: add embedded pricing catalog"
 - Create: `src/costats.Infrastructure/Expense/CopilotTelemetryDigestor.cs`
 - Create: `tests/costats.Tests/Expense/CopilotTelemetryDigestorTests.cs`
 
-- [ ] **Step 1: Write GHCP parser tests**
+- [x] **Step 1: Write GHCP parser tests**
 
 Create `tests/costats.Tests/Expense/CopilotTelemetryDigestorTests.cs`:
 
@@ -474,11 +474,11 @@ public sealed class CopilotTelemetryDigestorTests
 }
 ```
 
-- [ ] **Step 2: Add aggregation helper**
+- [x] **Step 2: Add aggregation helper**
 
 Create `src/costats.Infrastructure/Expense/ConsumptionSliceAggregator.cs` with `Add` and `Build` methods that aggregate by `DateOnly` and model into existing `ConsumptionSlice` instances.
 
-- [ ] **Step 3: Implement digestor**
+- [x] **Step 3: Implement digestor**
 
 Create `src/costats.Infrastructure/Expense/CopilotTelemetryDigestor.cs` with:
 
@@ -502,7 +502,7 @@ Implementation rules:
 - Accepted timestamp keys: `time_unix_nano`, `timeUnixNano`, `timestamp`, `time`.
 - Do not store or return any prompt/completion/message fields.
 
-- [ ] **Step 4: Run GHCP tests**
+- [x] **Step 4: Run GHCP tests**
 
 Run:
 
@@ -512,7 +512,7 @@ dotnet test .\tests\costats.Tests\costats.Tests.csproj --filter "FullyQualifiedN
 
 Expected: tests pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add src/costats.Infrastructure/Expense tests/costats.Tests/Expense
