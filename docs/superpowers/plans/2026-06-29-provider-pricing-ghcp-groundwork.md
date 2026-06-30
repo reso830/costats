@@ -645,7 +645,7 @@ git commit -m "refactor: preserve dynamic provider readings"
 - Review: `src/costats.Infrastructure/Providers/CopilotPersonalSource.cs`
 - Review: `docs/COPILOT-TELEMETRY.md`
 
-- [ ] **Step 1: Confirm opt-in default**
+- [x] **Step 1: Confirm opt-in default**
 
 Run:
 
@@ -658,7 +658,7 @@ Expected:
 - `CopilotTelemetryRoots` default is empty.
 - docs state telemetry is disabled by default.
 
-- [ ] **Step 2: Confirm no raw content retention**
+- [x] **Step 2: Confirm no raw content retention**
 
 Run:
 
@@ -670,7 +670,7 @@ Expected:
 - Digestor may mention prompt/completion fields only in comments or tests explaining ignored data.
 - Production code does not log or persist raw telemetry line content.
 
-- [ ] **Step 3: Confirm no network pricing refresh**
+- [x] **Step 3: Confirm no network pricing refresh**
 
 Run:
 
@@ -682,7 +682,7 @@ Expected:
 - No background pricing refresh service is registered.
 - `EnableNetworkRefresh` defaults to `false`.
 
-- [ ] **Step 4: Full verification**
+- [x] **Step 4: Full verification**
 
 Run:
 
@@ -697,7 +697,7 @@ Expected:
 - Release build passes.
 - Only intentional files are modified.
 
-- [ ] **Step 5: Commit verification docs if changed**
+- [x] **Step 5: Commit verification docs if changed**
 
 ```powershell
 git add docs/COPILOT-TELEMETRY.md
