@@ -66,8 +66,10 @@ public sealed class CopilotPersonalSource : ISignalSource
 
             if (result.Status != CopilotFetchStatus.Success || result.Payload is null)
             {
+                var partialConsumption = await GetTelemetryConsumptionAsync(cancellationToken).ConfigureAwait(false);
+                var partialUsage = BuildConsumptionOnlyUsage(now, partialConsumption);
                 return new ProviderReading(
-                    Usage: null,
+                    Usage: partialUsage,
                     Identity: identity,
                     StatusSummary: result.StatusSummary,
                     CapturedAt: now,
@@ -103,11 +105,13 @@ public sealed class CopilotPersonalSource : ISignalSource
 
             if (sessionUsed is null && weekUsed is null)
             {
+                var partialConsumption = await GetTelemetryConsumptionAsync(cancellationToken).ConfigureAwait(false);
+                var partialUsage = BuildConsumptionOnlyUsage(result.Payload.FetchedAt, partialConsumption);
                 return new ProviderReading(
-                    Usage: null,
+                    Usage: partialUsage,
                     Identity: identity,
                     StatusSummary: "No Copilot usage data available",
-                    CapturedAt: now,
+                    CapturedAt: partialUsage?.CapturedAt ?? now,
                     Confidence: ReadingConfidence.Low,
                     Source: ReadingSource.Api);
             }
@@ -152,15 +156,32 @@ public sealed class CopilotPersonalSource : ISignalSource
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Copilot usage read failed");
+            var fallbackConsumption = await GetTelemetryConsumptionAsync(cancellationToken).ConfigureAwait(false);
+            var fallbackUsage = BuildConsumptionOnlyUsage(now, fallbackConsumption);
             return new ProviderReading(
-                Usage: null,
+                Usage: fallbackUsage,
                 Identity: new IdentityCard(Profile.ProviderId, Profile.DisplayName, null, null, "Copilot", "Token"),
-                StatusSummary: "Copilot usage unavailable",
-                CapturedAt: now,
+                StatusSummary: fallbackUsage is null ? "Copilot usage unavailable" : "Copilot API unavailable; showing local telemetry",
+                CapturedAt: fallbackUsage?.CapturedAt ?? now,
                 Confidence: ReadingConfidence.Low,
                 Source: ReadingSource.Api);
         }
     }
+
+    private UsagePulse? BuildConsumptionOnlyUsage(DateTimeOffset capturedAt, ConsumptionDigest? consumption) =>
+        consumption is null
+            ? null
+            : new UsagePulse(
+                ProviderId: Profile.ProviderId,
+                CapturedAt: capturedAt,
+                SessionUsed: null,
+                SessionLimit: null,
+                WeekUsed: null,
+                WeekLimit: null,
+                SpendingBucket: null,
+                Consumption: consumption,
+                SessionWindow: null,
+                WeekWindow: null);
 
     private async Task<ConsumptionDigest?> GetTelemetryConsumptionAsync(CancellationToken cancellationToken)
     {

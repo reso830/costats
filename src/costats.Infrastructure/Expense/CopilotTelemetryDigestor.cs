@@ -28,8 +28,10 @@ public static class CopilotTelemetryDigestor
     private static readonly string[] OutputTokenKeys =
     [
         "gen_ai.usage.output_tokens",
+        "gen_ai.usage.reasoning_output_tokens",
         "completion_tokens",
-        "output_tokens"
+        "output_tokens",
+        "reasoning_tokens"
     ];
 
     private static readonly string[] ModelKeys =
@@ -263,7 +265,11 @@ public static class CopilotTelemetryDigestor
     }
 
     private static IEnumerable<string> EnumerateCandidateFiles(string root) =>
-        Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
+        Directory.EnumerateFiles(root, "*", new EnumerationOptions
+            {
+                RecurseSubdirectories = true,
+                IgnoreInaccessible = true
+            })
             .Where(file => CandidateFileExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase));
 
     private static bool TryFirst(IReadOnlyDictionary<string, string> fields, IReadOnlyList<string> keys, out string value)

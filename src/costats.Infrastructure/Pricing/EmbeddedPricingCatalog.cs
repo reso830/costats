@@ -8,7 +8,14 @@ public sealed class EmbeddedPricingCatalog : IPricingCatalog
         new Dictionary<string, ModelPricing>(StringComparer.OrdinalIgnoreCase)
         {
             ["claude-haiku-4-5"] = Anthropic("claude-haiku-4-5", 0.000001m, 0.0000001m, 0.00000125m, 0.000005m),
-            ["claude-sonnet-4-5"] = Anthropic("claude-sonnet-4-5", 0.000003m, 0.0000003m, 0.00000375m, 0.000015m),
+            ["claude-sonnet-4-5"] = Anthropic("claude-sonnet-4-5", 0.000003m, 0.0000003m, 0.00000375m, 0.000015m) with
+            {
+                TierThreshold = 200_000,
+                InputUsdPerTokenAboveTier = 0.000006m,
+                CachedInputUsdPerTokenAboveTier = 0.0000006m,
+                CacheWriteUsdPerTokenAboveTier = 0.0000075m,
+                OutputUsdPerTokenAboveTier = 0.0000225m
+            },
             ["claude-opus-4-5"] = Anthropic("claude-opus-4-5", 0.000005m, 0.0000005m, 0.00000625m, 0.000025m),
             ["claude-opus-4"] = Anthropic("claude-opus-4", 0.000015m, 0.0000015m, 0.00001875m, 0.000075m),
             ["claude-sonnet-4"] = Anthropic("claude-sonnet-4", 0.000003m, 0.0000003m, 0.00000375m, 0.000015m),
