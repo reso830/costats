@@ -5,10 +5,12 @@ using costats.App.Services;
 using costats.App.Services.Updates;
 using costats.App.ViewModels;
 using costats.Application.Abstractions;
+using costats.Application.Pricing;
 using costats.Application.Pulse;
 using costats.Application.Security;
 using costats.Application.Settings;
 using costats.Application.Shell;
+using costats.Infrastructure.Pricing;
 using costats.Infrastructure.Providers;
 using costats.Infrastructure.Pulse;
 using costats.Infrastructure.Security;
@@ -238,6 +240,7 @@ namespace costats.App
                         });
 
                     services.AddSingleton<IClock, SystemClock>();
+                    services.AddSingleton<IPricingCatalog, EmbeddedPricingCatalog>();
 
                     services.AddSingleton<PulseBroadcaster>();
                     services.AddSingleton<ISourceSelector, SourceSelector>();
