@@ -2,6 +2,8 @@ using costats.Application.Pulse;
 using costats.Application.Security;
 using costats.Application.Settings;
 using costats.Core.Pulse;
+using costats.Application.Pricing;
+using costats.Infrastructure.Expense;
 using Microsoft.Extensions.Logging;
 using static costats.Core.Pulse.UsageFormatter;
 
@@ -12,17 +14,23 @@ public sealed class CopilotPersonalSource : ISignalSource
     private readonly AppSettings _settings;
     private readonly ICredentialVault _credentialVault;
     private readonly CopilotUsageFetcher _fetcher;
+    private readonly IPricingCatalog _pricingCatalog;
+    private readonly ExpenseAnalyzer _expenseAnalyzer;
     private readonly ILogger<CopilotPersonalSource> _logger;
 
     public CopilotPersonalSource(
         AppSettings settings,
         ICredentialVault credentialVault,
         CopilotUsageFetcher fetcher,
+        IPricingCatalog pricingCatalog,
+        ExpenseAnalyzer expenseAnalyzer,
         ILogger<CopilotPersonalSource> logger)
     {
         _settings = settings;
         _credentialVault = credentialVault;
         _fetcher = fetcher;
+        _pricingCatalog = pricingCatalog;
+        _expenseAnalyzer = expenseAnalyzer;
         _logger = logger;
     }
 
@@ -113,6 +121,7 @@ public sealed class CopilotPersonalSource : ISignalSource
             QuotaWindow? weekWindow = weekUsed is not null
                 ? new QuotaWindow(monthlyDuration, resetAt)
                 : null;
+            var consumption = await GetTelemetryConsumptionAsync(cancellationToken).ConfigureAwait(false);
 
             var usage = new UsagePulse(
                 ProviderId: Profile.ProviderId,
@@ -122,7 +131,7 @@ public sealed class CopilotPersonalSource : ISignalSource
                 WeekUsed: weekUsed,
                 WeekLimit: weekLimit,
                 SpendingBucket: null,
-                Consumption: null,
+                Consumption: consumption,
                 SessionWindow: sessionWindow,
                 WeekWindow: weekWindow);
 
@@ -150,6 +159,30 @@ public sealed class CopilotPersonalSource : ISignalSource
                 CapturedAt: now,
                 Confidence: ReadingConfidence.Low,
                 Source: ReadingSource.Api);
+        }
+    }
+
+    private async Task<ConsumptionDigest?> GetTelemetryConsumptionAsync(CancellationToken cancellationToken)
+    {
+        if (!_settings.CopilotTelemetryEnabled || _settings.CopilotTelemetryRoots.Length == 0)
+        {
+            return null;
+        }
+
+        try
+        {
+            return await _expenseAnalyzer
+                .AnalyzeCopilotTelemetryAsync(_pricingCatalog, _settings.CopilotTelemetryRoots, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            _logger.LogDebug("Copilot telemetry analysis failed");
+            return null;
         }
     }
 

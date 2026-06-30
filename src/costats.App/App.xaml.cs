@@ -10,6 +10,7 @@ using costats.Application.Pulse;
 using costats.Application.Security;
 using costats.Application.Settings;
 using costats.Application.Shell;
+using costats.Infrastructure.Expense;
 using costats.Infrastructure.Pricing;
 using costats.Infrastructure.Providers;
 using costats.Infrastructure.Pulse;
@@ -241,6 +242,7 @@ namespace costats.App
 
                     services.AddSingleton<IClock, SystemClock>();
                     services.AddSingleton<IPricingCatalog, EmbeddedPricingCatalog>();
+                    services.AddSingleton<ExpenseAnalyzer>();
 
                     services.AddSingleton<PulseBroadcaster>();
                     services.AddSingleton<ISourceSelector, SourceSelector>();

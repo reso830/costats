@@ -530,7 +530,7 @@ git commit -m "feat: digest GitHub Copilot telemetry locally"
 - Modify: `src/costats.App/App.xaml.cs`
 - Create: `docs/COPILOT-TELEMETRY.md`
 
-- [ ] **Step 1: Add settings**
+- [x] **Step 1: Add settings**
 
 Modify `AppSettings`:
 
@@ -539,7 +539,7 @@ public bool CopilotTelemetryEnabled { get; set; } = false;
 public string[] CopilotTelemetryRoots { get; set; } = [];
 ```
 
-- [ ] **Step 2: Add analyzer entrypoint**
+- [x] **Step 2: Add analyzer entrypoint**
 
 Add to `ExpenseAnalyzer`:
 
@@ -552,11 +552,11 @@ public async Task<ConsumptionDigest?> AnalyzeCopilotTelemetryAsync(
 
 It should call `CopilotTelemetryDigestor.DigestAsync`, return `null` when there are no slices, and otherwise build the same `ConsumptionDigest` shape used by existing Codex/Claude analysis.
 
-- [ ] **Step 3: Attach telemetry consumption to Copilot source**
+- [x] **Step 3: Attach telemetry consumption to Copilot source**
 
 Update `CopilotPersonalSource` constructor to accept `AppSettings`, `IPricingCatalog`, and `ExpenseAnalyzer`. In `ReadAsync`, when `settings.CopilotTelemetryEnabled` is `true`, call `AnalyzeCopilotTelemetryAsync`; otherwise leave `Consumption` null. Keep API quota behavior unchanged.
 
-- [ ] **Step 4: Register dependencies**
+- [x] **Step 4: Register dependencies**
 
 In `App.xaml.cs`, register `ExpenseAnalyzer` and ensure `CopilotPersonalSource` is constructed by DI:
 
@@ -565,7 +565,7 @@ services.AddSingleton<ExpenseAnalyzer>();
 services.AddSingleton<ISignalSource, CopilotPersonalSource>();
 ```
 
-- [ ] **Step 5: Document privacy behavior**
+- [x] **Step 5: Document privacy behavior**
 
 Create `docs/COPILOT-TELEMETRY.md` with:
 
@@ -581,7 +581,7 @@ Telemetry-derived usage stays on the local machine. costats does not send teleme
 Leave `CopilotTelemetryEnabled` set to `false` to disable this feature.
 ```
 
-- [ ] **Step 6: Run build and tests**
+- [x] **Step 6: Run build and tests**
 
 Run:
 
@@ -592,7 +592,7 @@ dotnet build .\costats.sln -c Debug
 
 Expected: tests and build pass.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```powershell
 git add src/costats.Application/Settings/AppSettings.cs src/costats.Infrastructure/Expense src/costats.Infrastructure/Providers/CopilotPersonalSource.cs src/costats.App/App.xaml.cs docs/COPILOT-TELEMETRY.md
