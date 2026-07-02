@@ -19,6 +19,8 @@ public sealed class EmbeddedPricingCatalog : IPricingCatalog
             ["claude-opus-4-5"] = Anthropic("claude-opus-4-5", 0.000005m, 0.0000005m, 0.00000625m, 0.000025m),
             ["claude-opus-4"] = Anthropic("claude-opus-4", 0.000015m, 0.0000015m, 0.00001875m, 0.000075m),
             ["claude-sonnet-4"] = Anthropic("claude-sonnet-4", 0.000003m, 0.0000003m, 0.00000375m, 0.000015m),
+            ["gemini-3.5-flash"] = Google("gemini-3.5-flash", 0.000000075m, 0.00000001875m, 0.0000003m),
+            ["gemini-3.5-pro"] = Google("gemini-3.5-pro", 0.00000125m, 0.0000003125m, 0.000005m),
             ["gpt-5"] = OpenAi("gpt-5", 0.00000125m, 0.000000125m, 0.00001m),
             ["gpt-5.2"] = OpenAi("gpt-5.2", 0.00000175m, 0.000000175m, 0.000014m),
             ["o3"] = OpenAi("o3", 0.00001m, 0.0000025m, 0.00004m),
@@ -56,6 +58,20 @@ public sealed class EmbeddedPricingCatalog : IPricingCatalog
         new(
             modelId,
             "openai",
+            inputUsdPerToken,
+            cachedInputUsdPerToken,
+            0m,
+            outputUsdPerToken,
+            PricingSource.Embedded);
+
+    private static ModelPricing Google(
+        string modelId,
+        decimal inputUsdPerToken,
+        decimal cachedInputUsdPerToken,
+        decimal outputUsdPerToken) =>
+        new(
+            modelId,
+            "google",
             inputUsdPerToken,
             cachedInputUsdPerToken,
             0m,
