@@ -38,4 +38,16 @@ public sealed class AppSettings
     /// Empty means no telemetry roots are scanned.
     /// </summary>
     public string[] CopilotTelemetryRoots { get; set; } = [];
+
+    /// <summary>
+    /// Whether local Google Antigravity / Gemini telemetry/log database scanning is enabled.
+    /// Disabled by default because telemetry roots may contain sensitive local records.
+    /// </summary>
+    public bool AntigravityTelemetryEnabled { get; set; } = false;
+
+    /// <summary>
+    /// Explicit local roots to scan for Antigravity database (.db) records.
+    /// Empty means no database files are scanned.
+    /// </summary>
+    public string[] AntigravityTelemetryRoots { get; set; } = [];
 }

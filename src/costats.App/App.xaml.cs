@@ -249,6 +249,11 @@ namespace costats.App
                     services.AddSingleton<CopilotUsageFetcher>();
                     services.AddSingleton<ISignalSource, CodexLogSource>();
                     services.AddSingleton<ISignalSource, CopilotPersonalSource>();
+                    if (settings.AntigravityTelemetryEnabled)
+                    {
+                        services.AddSingleton<ISignalSource, AntigravitySource>();
+                    }
+
                     // Multicc integration: conditionally register per-profile or default Claude source
                     services.AddSingleton<MulticcConfigReader>();
 

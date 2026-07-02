@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="AdysTech.CredentialManager" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
 
   <PropertyGroup>
